@@ -6,4 +6,4 @@ An user could __browse__ through different kind of events, select one and progra
 
 As first approach, __microservices for managing users, events, notifications and sending the emails__ are needed, as well as an __API Gateway__.
 
-Further information will be specified as the course goes on.
+Further information will be specified in the [documentation](https://carlos-el.github.io/EventPost-CCProject/).
