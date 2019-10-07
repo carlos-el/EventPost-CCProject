@@ -12,7 +12,7 @@ We will develop an applicaction for managing, discovering and browsing events.
     - One for managing user accounts. Stores the users information and receives request for authentication and managing account. A RESTful API will be used for communication. Language and technology still to decide.
     - Another for managing events. Stores events information and receives request for managing events. A RESTful API will be used for communication. Language and technology still to decide.
     - A microservice for managin the notifications. Stores information relevant for the notifications and receives requests for managing them. Also uses a RESTful API for communication. Language and technology still to decide.
-    - Other microservice for sending the emails requested by other services. Includes a queu of emails and send them in order. Therefore the communication protocol will be AMQP. We will develop it in Javascript using node.js and RabbitMQ as messaging middleware.
-    - Finally and API Gateway is also needed as an interface for interacting with the microservices and authenticating users in different services.
+    - Other microservice for sending the emails requested by other services. Includes a queue of emails and send them in order. Therefore the communication protocol will be AMQP. We will develop it in Javascript using node.js and RabbitMQ as messaging middleware.
+    - Finally and API Gateway is also needed as an interface for interacting with the microservices and authenticating users in different services. In order to create a good experience for the user React will be used for creating the frontend of the API Gateway
 
  More information will be given as the course goes on.
