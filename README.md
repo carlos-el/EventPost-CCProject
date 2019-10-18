@@ -1,9 +1,12 @@
 # EventPost:
 
-### The idea for this project is to develop a microservices based application for events management and discovering.
+The goal is to achieve a fully deployed system while using and learning continuous and incremental integration, cloud services and agile procedures in projects. 
+Further information about architecture and other details is available in the __[documentation](https://carlos-el.github.io/EventPost-CCProject/index).__
 
-An user could __browse__ through different kind of events, select one and program email-based __notifications__ for. __Subscriptions__ to different event feeds could also be possible. 
+### Description.
+The idea for this project is to develop a microservices based application using the cloud.
+It will provide and event discovering and management system along with the possiblility of programming email-based notification for the desired events.
+An user could register, get events information, program a notification at a certain time for a desired event and manage his notifications.
 
-As first approach, __microservices for managing users, events, notifications and sending the emails__ are needed, as well as an __API Gateway__.
 
-Further information will be specified in the [documentation](https://carlos-el.github.io/EventPost-CCProject/index).
+
