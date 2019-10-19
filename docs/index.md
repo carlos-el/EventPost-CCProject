@@ -1,20 +1,29 @@
 # Project documentation section.
 ### Abstract:
-We will develop an applicaction for managing, discovering and browsing events.
-* The user adressing the page willl be able to:
-    - Create an account in our service.
-    - Browse he page in order to find event of interest.
-    - Program email-based notifications for different events. 
-    - Manage email-based subscriptions to different feeds based on event topics.
-    
+We will develop a microservices based application using the cloud.
+It will provide an event discovery and management system along with the possibility of programming email-based notification for the desired events.
 
-* We will be using a microservices based arquitecture. The microservices needed and their specifications to achieve our goal are the following:
-    - One for managing user accounts. Stores the users information and receives request for authentication and managing account. A RESTful API will be used for communication. Language and technology still to decide.
-    - Another for managing events. Stores events information and receives request for managing events. A RESTful API will be used for communication. Language and technology still to decide.
-    - A microservice for managin the notifications. Stores information relevant for the notifications and receives requests for managing them. Also uses a RESTful API for communication. Language and technology still to decide.
-    - Other microservice for sending the emails requested by other services. Includes a queue of emails and send them in order. Therefore the communication protocol will be AMQP. We will develop it in Javascript using node.js and RabbitMQ as messaging middleware.
-    - Finally and API Gateway is also needed as an interface for interacting with the microservices and authenticating users in different services. In order to create a good experience for the user React will be used for creating the frontend of the API Gateway.
+### Architecture:
+As stated before, we will be using a microservices based architecture. The microservices needed arise from decomposing our system using Domain Driven Design subdomains. The services developed to achieve our goal are the following:
+- Authentication: Stores the users' information and receives requests for authentication and managing accounts.
+- Events: Stores events information and receives requests for managing events. 
+- Notifications: Stores information relevant for the notifications and receives requests for managing them.
+- Email-sender: Sends emails to the users when requested by other services. 
 
-    ![Microservices architecture diagram](https://github.com/carlos-el/EventPost-CCProject/blob/master/docs/img/eventpost_architecture_diagram.png "Microservices architecture diagram")
+All of them will be addressed through a specific API Gateway.
+
+### Database management:
+In our system we will store the following data:
+- Users data for authentication (passwords, usernames, emails, etc.)
+- Events data (titles, descriptions, dates, etc).
+- Notifications data (destination email, content, subject, etc.)
+
+In order to keep services independent, a Database-per-service architecture will be implemented. Each database will be private to its corresponding microservice.
+
+### Technologies:
+The programming language chosen for the Authentication, Events and Notification services will be Python. NodeJS will be used for implementing the Email-sender and the API Gateway.
+Communication with the API Gateway will be done with RESTful and the microservices will contact the Email-sender service with asynchronous requests using the AMQP protocol and a queue manager middleware like RabbitMQ.
+
+![Microservices architecture diagram](https://github.com/carlos-el/EventPost-CCProject/blob/master/docs/img/eventpost_architecture_diagram.png "Microservices architecture diagram")
 
  More information will be given as the course goes on.
