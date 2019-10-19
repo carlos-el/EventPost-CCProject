@@ -24,6 +24,7 @@ In order to keep services independent, a Database-per-service architecture will 
 The programming language chosen for the Authentication, Events and Notification services will be Python. NodeJS will be used for implementing the Email-sender and the API Gateway.
 Communication with the API Gateway will be done with RESTful and the microservices will contact the Email-sender service with asynchronous requests using the AMQP protocol and a queue manager middleware like RabbitMQ.
 
+##### Arquitecture basic diagram.
 ![Microservices architecture diagram](img/eventpost_architecture_diagram.png "Microservices architecture diagram")
 
  More information will be given as the course goes on.
