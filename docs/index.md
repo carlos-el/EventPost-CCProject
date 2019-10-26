@@ -46,6 +46,6 @@ The programming language chosen for the Authentication, Events and Notification 
 Communication with the API Gateway will be done with RESTful and the microservices will contact the Email-sender service with asynchronous requests using the AMQP protocol and a queue manager middleware like RabbitMQ.
 
 ##### Arquitecture basic diagram.
-![Microservices architecture diagram](img/eventpost_architecture_diagram.png "Microservices architecture diagram")
+![Microservices architecture diagram](img/eventpost_architecture_diagram_v2.png "Microservices architecture diagram")
 
  More information will be given as the course goes on.
