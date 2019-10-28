@@ -68,7 +68,7 @@ In order to keep services independent, a Database-per-service architecture will 
 - Finally, __continuous integration__ and test will be done using [Travis-CI](https://travis-ci.org/) as it provides easy sync with GitHub and supports all the languages present in our project and Docker. Circle-CI was considered but its free plan lacks some features that Travis provides for open source projects. The test will be also used in local with [pytest](https://docs.pytest.org/en/latest/)
 
 ##### Arquitecture basic diagram.
-![Microservices architecture diagram](https://github.com/carlos-el/EventPost-CCProject/blob/master/docs/img/eventpost_architecture_diagram_v2.png "Microservices architecture diagram")
+![Microservices architecture diagram](https://github.com/carlos-el/EventPost-CCProject/blob/master/docs/img/eventpost_architecture_diagram_v3.png "Microservices architecture diagram")
 
  More information will be given as the course goes on.
 
