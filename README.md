@@ -25,7 +25,7 @@ The features found out in the user stories for each microservice have been mappe
     -   Delete an event.
     -   Edit an event.
 - [Notifications](https://github.com/carlos-el/EventPost-CCProject/milestone/7):
-    -   Create a notification for an event.
+    -   Create a notification.
     -   Get the notifications related to an account.
     -   Update the scheduled date and time of a notification.
     -   Update the email where a notification is going to be send.
