@@ -9,21 +9,48 @@ jobs:
     steps:
       #install dependencies and run tests
       - checkout 
-      - run: pip3 install -r requirements.txt
-      - run: invoke test
+      - run: 
+          name: install dependencies
+          command: | 
+            pip3 install virtualenv
+            virtualenv venv
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      - run: 
+          name: run tests
+          command: |
+            invoke test
 
   build-372:
     docker:
       - image: circleci/python:3.7.2
     steps:
       - checkout 
-      - run: pip3 install -r requirements.txt
-      - run: invoke test
+      - run: 
+          name: install dependencies
+          command: | 
+            pip3 install virtualenv
+            virtualenv venv
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      - run: 
+          name: run tests
+          command: |
+            invoke test
 
   build-367:
     docker:
       - image: circleci/python:3.6.7
     steps:
       - checkout 
-      - run: pip3 install -r requirements.txt
-      - run: invoke test
+      - run: 
+          name: install dependencies
+          command: | 
+            pip3 install virtualenv
+            virtualenv venv
+            . venv/bin/activate
+            pip3 install -r requirements.txt
+      - run: 
+          name: run tests
+          command: |
+            invoke test
