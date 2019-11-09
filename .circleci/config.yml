@@ -1,0 +1,29 @@
+#Run latest version of circleci
+version: 2.1
+#Jobs for testing in different versions of the language
+jobs:
+  test-latest:
+    docker:
+      #version of the docker image
+      - image: circleci/python:latest
+    steps:
+      #install dependencies and run tests
+      - checkout 
+      - run: pip3 install -r requirements.txt
+      - run: invoke test
+
+  test-3.7.2:
+    docker:
+      - image: circleci/python:3.7.2
+    steps:
+      - checkout 
+      - run: pip3 install -r requirements.txt
+      - run: invoke test
+
+  test-3.6.7:
+    docker:
+      - image: circleci/python:3.6.7
+    steps:
+      - checkout 
+      - run: pip3 install -r requirements.txt
+      - run: invoke test
