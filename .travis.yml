@@ -2,8 +2,8 @@
 language: python
 
 # select versions to test our system
+# fails in 3.4 and earlier versioend due to dependencies
 python:
-  - "3.4"
   - "3.5"
   - "3.6"
   - "3.7"

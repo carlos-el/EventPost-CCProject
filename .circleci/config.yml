@@ -12,7 +12,7 @@ jobs:
       - run: pip3 install -r requirements.txt
       - run: invoke test
 
-  test-3.7.2:
+  test-372:
     docker:
       - image: circleci/python:3.7.2
     steps:
@@ -20,7 +20,7 @@ jobs:
       - run: pip3 install -r requirements.txt
       - run: invoke test
 
-  test-3.6.7:
+  test-367:
     docker:
       - image: circleci/python:3.6.7
     steps:
