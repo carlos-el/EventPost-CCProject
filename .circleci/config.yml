@@ -2,7 +2,7 @@
 version: 2.1
 #Jobs for testing in different versions of the language
 jobs:
-  test-latest:
+  build:
     docker:
       #version of the docker image
       - image: circleci/python:latest
@@ -12,7 +12,7 @@ jobs:
       - run: pip3 install -r requirements.txt
       - run: invoke test
 
-  test-372:
+  build-372:
     docker:
       - image: circleci/python:3.7.2
     steps:
@@ -20,7 +20,7 @@ jobs:
       - run: pip3 install -r requirements.txt
       - run: invoke test
 
-  test-367:
+  build-367:
     docker:
       - image: circleci/python:3.6.7
     steps:
