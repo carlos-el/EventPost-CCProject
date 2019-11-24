@@ -1,6 +1,6 @@
 # event_dator.py file, EventDator is currently a mock for giving data.
 
-from lib.singleton import Singleton
+from libs.singleton import Singleton
 from events_microservice.models.event import Event
 import datetime as dt
 
