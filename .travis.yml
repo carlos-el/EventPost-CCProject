@@ -13,10 +13,11 @@ python:
 
 # install dependencies
 install:
-  - pip3 install -r requirements.txt
+  - pip3 install invoke
 
 # use task tool for executing test
 script:
+  - invoke installdependencies
   - invoke test
 
 # use task tool for checking coverage of our tests
