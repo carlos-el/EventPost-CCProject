@@ -17,7 +17,7 @@ install:
 
 # use task tool for executing test
 script:
-  - invoke installdependencies
+  - invoke installDependencies
   - invoke test
 
 # use task tool for checking coverage of our tests
