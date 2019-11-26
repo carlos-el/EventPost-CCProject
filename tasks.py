@@ -56,6 +56,7 @@ def uploadImageToGithub(c):
     c.run("export IMG_ID1=`docker images eventpost-ccproject_events_container -q`")
     c.run("export IMG_ID2=`docker images eventpost-ccproject_notifications_container -q`")
     c.run("echo 'Test variables'")
+    c.run("docker images eventpost-ccproject_events_container -q")
     c.run("echo $IMG_ID1")
     c.run("echo $IMG_ID2")
     c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
