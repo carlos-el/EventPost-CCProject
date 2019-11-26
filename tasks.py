@@ -58,11 +58,11 @@ def uploadImageToGithub(c):
 
     c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
     
-    c.run("docker tag IMG_ID1 docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-events:latest")
-    c.run("docker tag IMG_ID2 docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-notifications:latest")
+    c.run("docker tag IMG_ID1 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-events:latest")
+    c.run("docker tag IMG_ID2 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-notifications:latest")
     
-    c.run("docker push docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-events:latest")
-    c.run("docker push docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-notifications:latest")
+    c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-events:latest")
+    c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-notifications:latest")
 
 
 # starts the server with the specified parameters
