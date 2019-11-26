@@ -55,9 +55,13 @@ def uploadImageToGithub(c):
     c.config.run.shell = proper_shell
     c.run("export IMG_ID1=`docker images eventpost-ccproject_events_container -q`")
     c.run("export IMG_ID2=`docker images eventpost-ccproject_notifications_container -q`")
+    c.run("echo $IMG_ID1")
+    c.run("echo $IMG_ID2")
     c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
+    c.run("Login done")
     c.run("docker tag $IMG_ID1 docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_events_container:latest")
     c.run("docker tag $IMG_ID2 docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_notifications_container:latest")
+    c.run("echo 'Tags done'")
     c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_events_container:latest")
     c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_notifications_container:latest")
 
