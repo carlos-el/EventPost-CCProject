@@ -11,15 +11,23 @@ python:
   - "3.8-dev"
   - "nightly"
 
+# specify the docker use
+services:
+  - docker
+
 # install dependencies
 install:
   - pip3 install invoke
+  - invoke installDependencies
+  - invoke installDockerCompose
+  - invoke buildContainers
 
 # use task tool for executing test
 script:
-  - invoke installDependencies
   - invoke test
+  - invoke testContainers
 
 # use task tool for checking coverage of our tests
 after_success:
   - invoke coverage
+  - invoke uploadImageToGithub

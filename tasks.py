@@ -29,15 +29,45 @@ def coverage(c):
     c.run("coverage xml")
     c.run("codecov")
 
-# installs docker_compose
+# installs docker-compose
 @task
 def installDockerCompose(c):
     c.config.run.shell = proper_shell
     c.run("curl -L https://github.com/docker/compose/releases/download/1.25.0/docker-compose-`uname -s`-`uname -m` -o docker-compose")
     c.run("chmod +x docker-compose")
 
+# tests that the containers have been created
+@task
+def testContainers(c):
+    c.config.run.shell = proper_shell
+    c.run("docker ps -a | grep -q 'events'")
+    c.run("docker ps -a | grep -q 'notifications'")
+
+# builds and runs in bg the images with the microservices
+@task
+def buildContainers(c):
+    c.config.run.shell = proper_shell
+    c.run("docker-compose up -d")
+
+# uploads the docker images created to Github repository registry 
+@task
+def uploadImageToGithub(c):
+    c.config.run.shell = proper_shell
+    c.run("export IMG_ID1=`docker images -q | head -1`")
+    c.run("export IMG_ID2=`docker images -q | head -2 | tail -1`")
+
+    c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
+    
+    c.run("docker tag IMG_ID1 docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-events:latest")
+    c.run("docker tag IMG_ID2 docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-notifications:latest")
+    
+    c.run("docker push docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-events:latest")
+    c.run("docker push docker.pkg.github.com/carlos-el/EventPost-CCProject/alpine-notifications:latest")
+
+
 # starts the server with the specified parameters
 @task
 def startServer(c, host, port, service):
     c.config.run.shell = proper_shell
     c.run("gunicorn -b %s:%s %s &" %(host, port, service))
+
