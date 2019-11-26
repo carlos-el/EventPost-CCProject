@@ -1,8 +1,10 @@
 .*
 LICENSE
 *.md
+*.yml
 coverage.xml
 requirements.txt
+Dockerfile
 docs
 tests
 venv
