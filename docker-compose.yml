@@ -14,13 +14,13 @@ services:
     # and we want to serve it in the actual port 80 we should put 80:8000
     ports:
       - "$EVENTS_EXTERNAL_PORT:$EVENTS_INTERNAL_PORT"
-  # notifications_container:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #     # arguments we pass to the container
-  #     args:
-  #       PORT: $NOTIFICATIONS_INTERNAL_PORT
-  #       SERVICE: notifications_microservice.app
-  #   ports:
-  #       - "$NOTIFICATIONS_EXTERNAL_PORT:$NOTIFICATIONS_INTERNAL_PORT"
+  notifications_container:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # arguments we pass to the container
+      args:
+        PORT: $NOTIFICATIONS_INTERNAL_PORT
+        SERVICE: notifications_microservice.app
+    ports:
+        - "$NOTIFICATIONS_EXTERNAL_PORT:$NOTIFICATIONS_INTERNAL_PORT"

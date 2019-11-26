@@ -14,10 +14,9 @@ WORKDIR /app
 
 RUN apk update && apk upgrade \     
     && apk add python3 \
-    && pip3 install invoke \
-    && invoke installDependencies
+    && pip3 install falcon gunicorn
 
-ENTRYPOINT invoke startServer -p ${PORT} -h 0.0.0.0 -s ${SERVICE}
+ENTRYPOINT gunicorn -b 0.0.0.0:${PORT} ${SERVICE} 
 
 
 

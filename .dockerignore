@@ -1,9 +1,8 @@
 .*
 LICENSE
 *.md
-*.dockerignore
 coverage.xml
-dockerfiles
+requirements.txt
 docs
 tests
 venv
