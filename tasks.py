@@ -56,10 +56,10 @@ def uploadImageToGithub(c):
     c.run("export IMG_ID1=`docker images -q | head -1`")
     c.run("export IMG_ID2=`docker images -q | head -2 | tail -1`")
 
-    c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
+    c.run("docker login docker.pkg.github.com -u carlos-el --password-stdin $GITHUB_ACCESS_TOKEN")
     
-    c.run("docker tag IMG_ID1 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-events:latest")
-    c.run("docker tag IMG_ID2 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-notifications:latest")
+    c.run("docker tag $IMG_ID1 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-events:latest")
+    c.run("docker tag $IMG_ID2 docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-notifications:latest")
     
     c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-events:latest")
     c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/alpine-notifications:latest")
