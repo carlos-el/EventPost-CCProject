@@ -53,8 +53,8 @@ def buildContainers(c):
 @task
 def uploadImageToGithub(c):
     c.config.run.shell = proper_shell
-    c.run("export IMG_ID1=`docker images eventpost-ccproject_events_container -q`")
-    c.run("export IMG_ID2=`docker images eventpost-ccproject_notifications_container -q`")
+    c.run("env IMG_ID1=`docker images eventpost-ccproject_events_container -q`")
+    c.run("env IMG_ID2=`docker images eventpost-ccproject_notifications_container -q`")
     c.run("echo 'Test variables'")
     c.run("docker images eventpost-ccproject_events_container -q")
     c.run("echo $IMG_ID1")
