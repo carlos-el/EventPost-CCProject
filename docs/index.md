@@ -4,6 +4,20 @@
 The idea for this project is to develop a microservices based application for the cloud.
 It will provide a discovering and management system for social events along with the possiblility of programming email-based notification for the desired events as reminders.
 
+## Usage:
+
+- Previous requirements: `Docker`
+- Python version: `3.5 - latest`
+- Install: 
+    - `pip3 install invoke`
+    - `invoke installDependencies`
+    - `invoke installDockerCompose`
+- Build: `invoke buildContainers`
+- Test: 
+    - `invoke test`
+    - `testContainers`
+- Coverage: `invoke coverage`
+
 ## Architecture:
 As stated before, we will be using a microservices based architecture with one microservice per entity in the system and one as task dispatcher. The microservices needed arise from decomposing our system using Domain Driven Design subdomains. The microservices developed to achieve our goal are the following:
 - Events: Stores events information and receives requests for managing events. 
@@ -87,5 +101,28 @@ Additionally the User management system will include the following features.
     -   Add a secondary email to an account.
 
 This features has been mapped into milestones and issues.
+
+## Continuous integration:
+This section will describe the continuous integration system and tools, the testing and the building tool used.
+
+### Testing:
+A series of unitary test have been develop for our basic microservice entities. For testing the code the python library [pytest](https://docs.pytest.org/en/latest/contents.html) has been used. Another library, [coverage](https://coverage.readthedocs.io/en/v4.5.x/), has been also used for generating the testing coverage reports. Finally this information is uploaded to [CodeCov](https://codecov.io/) using its command tool.
+
+Once we have created our test we can execute them, check the tests coverage, generate a report file and upload the report to CodeCov.
+
+### Task tool:
+buildtool: tasks.py
+
+As we are using python the task tool selected has been [invoke](http://www.pyinvoke.org/). It uses the file [tasks.py](./tasks.py) for declaring tasks. In each task we can declare a series of cammands to execute. Finally we can do `invoke <task>` to carry out the desired task.
+
+We created tasks for updating the dependencies file (requirements.txt), installing new dependencies, running test and creating coverage reports. Later on in the project we will be able to create tasks for building and deploying the project.
+
+### CI tools:
+
+For continuous integration we have used two different tools, Travis-CI and Circle-CI. For both of them to work we need to link our GitHub account to the services, allow access to the our repository and add a configuration file.
+
+For TravisCI the file used is [.travis.yml](./.travis.yml). There we can specify the laguage versions to test and the commands for setting it up. In previous test we found out that the system does not work below python3.5 due to dependencies.
+
+For CircleCI the file used is [config.yml](./.circleci/config.yml). The concept is the same as in the travis file but with a different sintax. More information about both files can be found in their links.
 
  More information will be given as the course goes on.

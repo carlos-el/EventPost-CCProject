@@ -8,38 +8,63 @@
 The goal is to achieve a fully deployed system while using and learning continuous and incremental integration, cloud services and agile procedures in projects. 
 Further information about the project and previous milestones is available in the __[documentation](https://carlos-el.github.io/EventPost-CCProject/index).__
 
-### Architecture:
-We will be using a microservices based architecture. The microservices needed arise from decomposing our system using Domain Driven Design subdomains. The microservices developed to achieve our goal, their specification, technologies and more architecture related information available [here](https://carlos-el.github.io/EventPost-CCProject/index#architecture).
+## Docker
+This section will describe how the use of docker has been added to our system and how it benefits from it.
 
-### User stories and functionalities:
-The user stories for the project and the functionalities derived from them that have been maped into porject milestones and issues can be found [here](https://carlos-el.github.io/EventPost-CCProject/index#user-stories).
+#### Development:
+In order to really show the Docker potential we have advanced in the development of our microservices. The Events and Notifications microservices have their main functionality implemented. It is possible to make CRUD operations over their resources using RESTful requests. For providing data to the resources we have created dators (actually mockers) that are injected into the resources.
 
-## Continuous integration:
-This section will describe the continuous integration system and tools, the testing and the building tool used.
+The choosen server has been [gunicorn](https://gunicorn.org/) using [Falcon](https://falconframework.org/) as microframework. For making the integration tests on the server resources we have used pytest and a Falcon feature, a testing client that lets us send requests to the server without starting it.
 
-### Testing:
-A series of unitary test have been develop for our basic microservice entities. For testing the code the python library [pytest](https://docs.pytest.org/en/latest/contents.html) has been used. Another library, [coverage](https://coverage.readthedocs.io/en/v4.5.x/), has been also used for generating the testing coverage reports. Finally this information is uploaded to [CodeCov](https://codecov.io/) using its command tool.
+### Docker use:
+The base image choosen for the containers has been alpine. Its really light allowing a fast development, test and deployment and also its quite popular so we can easily solve problems (we had to resolve some problems in invoke as the alpine shell is not bash but sh).
 
-Once we have created our test we can execute them, check the tests coverage, generate a report file and upload the report to CodeCov.
+We have until now 2 microservices so we will be running 2 containers. Both containers will be created using a single parametrized Dockerfile. [Link to Dockerfile](./Dockerfile)
 
-### Task tool:
-buildtool: tasks.py
+The Dockerfile does the following:
+- Pulls the selected docker image.
+- Declares 2 arguments to be used, SERVICE (name of the service) and PORT (port used to start the service) and exposes the port specified.
+- Copies the files needed for the service in a directory and sets it as working directory. In order to copy only the strictly needed files a [.dockerignore](./.dockerignore) has been used.
+- Updates and installs dependencies.
+- Defines an entrypoint for starting the serven when the container is created.
 
-As we are using python the task tool selected has been [invoke](http://www.pyinvoke.org/). It uses the file [tasks.py](./tasks.py) for declaring tasks. In each task we can declare a series of cammands to execute. Finally we can do `invoke <task>` to carry out the desired task.
+For creating 2 different images with a single dockerfile we have used docker-compose. [Link to docker-compose file](./docker-compose.yml).
 
-We created tasks for updating the dependencies file (requirements.txt), installing new dependencies, running test and creating coverage reports. Later on in the project we will be able to create tasks for building and deploying the project.
+The docker-compose file does the following twice, one for each microservice:
+- Specifies the name of the image.
+- Sets the image context and the location of the dockerfile to use.
+- Pass to the dockerfile 2 arguments that it takes form environment variables.
+- Specifies the host-container port mapping.
 
-### CI tools:
+When the docker-compose file is executed using `docker-compose up -d` with success both microservices will be ready to receive requests.
 
-For continuous integration we have used two different tools, Travis-CI and Circle-CI. For both of them to work we need to link our GitHub account to the services, allow access to the our repository and add a configuration file.
+The links to the containers are the following:
+Contenedor: https://github.com/carlos-el/EventPost-CCProject/packages/63507
+Contenedor: https://github.com/carlos-el/EventPost-CCProject/packages/63509
 
-For TravisCI the file used is [.travis.yml](./.travis.yml). There we can specify the laguage versions to test and the commands for setting it up. In previous test we found out that the system does not work below python3.5 due to dependencies.
 
-For CircleCI the file used is [config.yml](./.circleci/config.yml). The concept is the same as in the travis file but with a different sintax. More information about both files can be found in their links.
+#### Task tool (invoke):
+New commands have been added to the [task tool](./tasks.py). The new functionalities include:
+- Installing docker-compose.
+- Building the images and the containers for our microservices.
+- Testing that the images have been created the right way after executing 'docker-compose up'.
+- Uploading the docker images created with 'docker-compose up' to GitHub registry.
+- Starting microservices server.
+
+#### CI tools update:
+In the [travis file](./.travis.yml), in the install section we have added one command for installing docker-compose and other for building the images and the containers with docker-compose.
+In the script section we have added an order for testing the container and finally in the after_success section a command for uploading the docker images created to GitHub. All commands are invoke tasks.
 
 ## Usage:
 
+- Previous requirements: `Docker`
 - Python version: `3.5 - latest`
-- Install: `pip3 install -r requirements.txt`
-- Test: `invoke test`
+- Install: 
+    - `pip3 install invoke`
+    - `invoke installDependencies`
+    - `invoke installDockerCompose`
+- Build: `invoke buildContainers`
+- Test: 
+    - `invoke test`
+    - `testContainers`
 - Coverage: `invoke coverage`
