@@ -13,6 +13,8 @@ This section will describe how the use of docker has been added to our system an
 
 #### Development:
 In order to really show the Docker potential we have advanced in the development of our microservices. The Events and Notifications microservices have their main functionality implemented. It is possible to make CRUD operations over their resources using RESTful requests. For providing data to the resources we have created dators (actually mockers) that are injected into the resources.
+The issues related to user stories that had been closed with this update: [#29](https://github.com/carlos-el/EventPost-CCProject/issues/29), [#30](https://github.com/carlos-el/EventPost-CCProject/issues/30), [#31](https://github.com/carlos-el/EventPost-CCProject/issues/31), [#32](https://github.com/carlos-el/EventPost-CCProject/issues/32), [#34](https://github.com/carlos-el/EventPost-CCProject/issues/34), [#35](https://github.com/carlos-el/EventPost-CCProject/issues/35), [#36](https://github.com/carlos-el/EventPost-CCProject/issues/36)
+
 
 The choosen server has been [gunicorn](https://gunicorn.org/) using [Falcon](https://falconframework.org/) as microframework. For making the integration tests on the server resources we have used pytest and a Falcon feature, a testing client that lets us send requests to the server without starting it.
 
