@@ -1,7 +1,7 @@
 import falcon
 import json
 from events_microservice.models.event import Event
-from libs.utils import serialize, event_json_decoder
+from events_microservice.utils.decoders import serialize, event_json_decoder
 
 
 class EventsResource(object):

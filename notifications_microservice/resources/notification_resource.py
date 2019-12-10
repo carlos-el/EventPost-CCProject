@@ -1,7 +1,7 @@
 import falcon
 import json
 from notifications_microservice.models.notification import Notification
-from libs.utils import serialize, notification_json_decoder
+from notifications_microservice.utils.decoders import serialize, notification_json_decoder
 
 
 class NotificationResource(object):

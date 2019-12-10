@@ -1,6 +1,6 @@
 # notification_dator.py file, NotificationDator is currently a mock for giving data.
 
-from libs.singleton import Singleton
+from notifications_microservice.utils.singleton import Singleton
 from notifications_microservice.models.notification import Notification
 import datetime as dt
 
