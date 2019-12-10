@@ -27,7 +27,7 @@ script:
   - invoke test
   - invoke testContainers
 
-# use task tool for checking coverage of our tests
+# use task tool for checking coverage of our tests and upload images
 after_success:
   - invoke coverage
   - invoke uploadImageToGithub
