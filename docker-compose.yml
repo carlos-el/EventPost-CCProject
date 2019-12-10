@@ -1,26 +1,17 @@
+#Before using this file the variables EVENTS_EXTERNAL_PORT 
+#and NOTIFICATIONS_EXTERNAL_PORT must be set.
 version: "3"
 
 services:
   events_container:
     build:
       context: .
-      dockerfile: Dockerfile
-      # arguments we pass to the container
-      args:
-        PORT: $EVENTS_INTERNAL_PORT
-        SERVICE: events_microservice.app
-    # the internal port is mapped to the external one,
-    # so if we start the server in the 8000 inside the container
-    # and we want to serve it in the actual port 80 we should put 80:8000
+      dockerfile: Dockerfile.events
     ports:
-      - "$EVENTS_EXTERNAL_PORT:$EVENTS_INTERNAL_PORT"
+      - "$EVENTS_EXTERNAL_PORT:8080"
   notifications_container:
     build:
       context: .
-      dockerfile: Dockerfile
-      # arguments we pass to the container
-      args:
-        PORT: $NOTIFICATIONS_INTERNAL_PORT
-        SERVICE: notifications_microservice.app
+      dockerfile: Dockerfile.notifications
     ports:
-        - "$NOTIFICATIONS_EXTERNAL_PORT:$NOTIFICATIONS_INTERNAL_PORT"
+      - "$NOTIFICATIONS_EXTERNAL_PORT:8080"
