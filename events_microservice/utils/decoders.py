@@ -1,7 +1,5 @@
 import datetime as dt
 from events_microservice.models.event import Event
-from notifications_microservice.models.notification import Notification
-
 
 def serialize(obj):
     if isinstance(obj, dt.date):
