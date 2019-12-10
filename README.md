@@ -40,9 +40,15 @@ The docker-compose file does the following twice, one for each microservice:
 
 When the docker-compose file is executed using `docker-compose up -d` with success both microservices will be ready to receive requests.
 
-The links to the containers are the following:
-Contenedor: https://github.com/carlos-el/EventPost-CCProject/packages/63507
-Contenedor: https://github.com/carlos-el/EventPost-CCProject/packages/63509
+The links to the DockerHub containers is the following:
+
+Container: TODO
+
+Additionally the the containers have been uploaded to GitHub packages in the following URLs:
+
+https://github.com/carlos-el/EventPost-CCProject/packages/63507
+
+https://github.com/carlos-el/EventPost-CCProject/packages/63509
 
 
 #### Task tool (invoke):
