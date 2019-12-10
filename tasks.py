@@ -40,8 +40,8 @@ def installDockerCompose(c):
 @task
 def testContainers(c):
     c.config.run.shell = proper_shell
-    c.run("docker ps -a | grep -q 'events'")
-    c.run("docker ps -a | grep -q 'notifications'")
+    c.run("docker images | grep 'eventpost-ccproject_events_container'")
+    c.run("docker images | grep 'eventpost-ccproject_notifications_container'")
 
 # builds and runs in bg the images with the microservices
 @task
