@@ -1,14 +1,20 @@
 #Before using this file the variables EVENTS_EXTERNAL_PORT 
 #and NOTIFICATIONS_EXTERNAL_PORT must be set.
-version: "3"
 
+# Builds the images for the Events and notifications microservices.
+# If 'up' command is used also starts the containers.
+
+version: "3"
 services:
+  # Settings for events microservice, context, path to dockerfile and port mapping.
   events_container:
     build:
       context: .
       dockerfile: Dockerfile.events
+    # Specifies the external port where the internal containers port should be mapped to.
     ports:
       - "$EVENTS_EXTERNAL_PORT:8080"
+  # Settings for notifications microservice, context, path to dockerfile and port mapping.
   notifications_container:
     build:
       context: .
