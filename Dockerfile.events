@@ -1,0 +1,20 @@
+FROM alpine
+LABEL maintainer "carlos-el <celopez@correo.ugr.es>"
+
+ENV PORT=8080
+
+EXPOSE ${PORT}
+
+RUN apk update && apk upgrade \     
+    && apk add python3 \
+    && pip3 install falcon gunicorn \
+    && adduser -D docker_user
+
+USER docker_user
+COPY events_microservice /home/docker_user/events_microservice
+WORKDIR /home/docker_user
+
+ENTRYPOINT gunicorn -b 0.0.0.0:${PORT} events_microservice.app
+
+
+
