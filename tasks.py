@@ -47,18 +47,17 @@ def testContainers(c):
 @task
 def buildContainers(c):
     c.config.run.shell = proper_shell
-    c.run("docker-compose up -d")
+    c.run("docker-compose build")
 
 # uploads the docker images created to Github repository registry 
 @task
 def uploadImageToGithub(c):
     c.config.run.shell = proper_shell
-    c.run("docker login docker.pkg.github.com -u carlos-el -p $GITHUB_ACCESS_TOKEN")
+    c.run("docker login docker.pkg.github.com -u $GITHUB_USER -p $GITHUB_ACCESS_TOKEN")
     c.run("docker tag `docker images eventpost-ccproject_events_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_events_container:latest")
     c.run("docker tag `docker images eventpost-ccproject_notifications_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_notifications_container:latest")
-    c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_events_container:latest")
-    c.run("docker push docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_notifications_container:latest")
-
+    c.run("docker push docker.pkg.github.com/$GITHUB_USER/eventpost-ccproject_events_container:latest")
+    c.run("docker push docker.pkg.github.com/$GITHUB_USER/eventpost-ccproject_notifications_container:latest")
 
 # starts the server with the specified parameters
 @task
