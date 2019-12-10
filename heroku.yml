@@ -1,3 +1,6 @@
+# As refered in the official docs (https://devcenter.heroku.com/articles/build-docker-images-heroku-yml#build-defining-your-build)
+# we set the section 'build' and specify the relative path to the dockerfile,
+# the default CMD specified in the Dockerfile is used if no run section is created
 build:
   docker:
     web: Dockerfile.events
