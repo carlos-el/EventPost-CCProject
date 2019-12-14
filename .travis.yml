@@ -19,7 +19,6 @@ services:
 install:
   - pip3 install invoke
   - invoke installDependencies
-  - invoke installDockerCompose
   - invoke buildContainers
 
 # use task tool for executing test
