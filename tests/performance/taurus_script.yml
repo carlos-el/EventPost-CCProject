@@ -1,0 +1,21 @@
+# Define and execution test
+execution:
+  # Set concurrency to 100 (100 concurrent users making requests)
+- concurrency: 100
+  # Reach the specfied concurrency in 15 secs
+  ramp-up: 15s
+  # Keep the load for 30 secs
+  hold-for: 30s
+  # Specifies in how many steps should the concurrency be achieved.
+  # In this case every 5 secs the number of users is incremented in 
+  # a percentage before achieving 100 concurrent virtual users.
+  steps: 3
+  # Nme of the scenario to be used.
+  scenario: quick-test
+
+scenarios:
+  # Define the scenario name
+  quick-test:
+    # Specify scenarios parameters, in this case only the objective URL.
+    requests:
+      - http://localhost:8000/events
