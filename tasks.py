@@ -40,24 +40,32 @@ def installDockerCompose(c):
 @task
 def testContainers(c):
     c.config.run.shell = proper_shell
-    c.run("docker images | grep 'eventpost-ccproject_events_container'")
-    c.run("docker images | grep 'eventpost-ccproject_notifications_container'")
+    c.run("docker images | grep 'events_container'")
+    c.run("docker images | grep 'notifications_container'")
 
-# builds and runs in bg the images with the microservices
+# builds and the images with the microservices
 @task
 def buildContainers(c):
     c.config.run.shell = proper_shell
-    c.run("docker-compose build")
+    c.run("docker build -f Dockerfile.events -t events_container .")
+    c.run("docker build -f Dockerfile.notifications -t notifications_container .")
+
+# runs in bg the containers with the microservices
+@task
+def runContainers(c):
+    c.config.run.shell = proper_shell
+    c.run("docker run --rm -dit -p 8000:8080 events_container")
+    c.run("docker run --rm -dit -p 8000:8080 notifications_container")
 
 # uploads the docker images created to Github repository registry 
 @task
 def uploadImageToGithub(c):
     c.config.run.shell = proper_shell
     c.run("docker login docker.pkg.github.com -u $GITHUB_USER -p $GITHUB_ACCESS_TOKEN")
-    c.run("docker tag `docker images eventpost-ccproject_events_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_events_container:latest")
-    c.run("docker tag `docker images eventpost-ccproject_notifications_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/eventpost-ccproject_notifications_container:latest")
-    c.run("docker push docker.pkg.github.com/$GITHUB_USER/eventpost-ccproject_events_container:latest")
-    c.run("docker push docker.pkg.github.com/$GITHUB_USER/eventpost-ccproject_notifications_container:latest")
+    c.run("docker tag `docker images events_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/events_container:latest")
+    c.run("docker tag `docker images notifications_container -q` docker.pkg.github.com/carlos-el/eventpost-ccproject/notifications_container:latest")
+    c.run("docker push docker.pkg.github.com/$GITHUB_USER/events_container:latest")
+    c.run("docker push docker.pkg.github.com/$GITHUB_USER/notifications_container:latest")
 
 # starts the server with the specified parameters
 @task
