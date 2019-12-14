@@ -106,7 +106,9 @@ This features has been mapped into milestones and issues.
 This section will describe the continuous integration system and tools, the testing and the building tool used.
 
 ### Testing:
-A series of unitary test have been develop for our basic microservice entities. For testing the code the python library [pytest](https://docs.pytest.org/en/latest/contents.html) has been used. Another library, [coverage](https://coverage.readthedocs.io/en/v4.5.x/), has been also used for generating the testing coverage reports. Finally this information is uploaded to [CodeCov](https://codecov.io/) using its command tool.
+A series of tests have been develop for our microservices. For testing the code the python library [pytest](https://docs.pytest.org/en/latest/contents.html) has been used. Another library, [coverage](https://coverage.readthedocs.io/en/v4.5.x/), has been also used for generating the testing coverage reports. Finally this information is uploaded to [CodeCov](https://codecov.io/) using its command tool.
+
+For implementing integration tests for the REST services we have used pytest and a Falcon feature, a [testing client](https://falcon.readthedocs.io/en/stable/api/testing.html) that lets us send requests to the server without starting it.
 
 Once we have created our test we can execute them, check the tests coverage, generate a report file and upload the report to CodeCov.
 
@@ -115,7 +117,7 @@ buildtool: tasks.py
 
 As we are using python the task tool selected has been [invoke](http://www.pyinvoke.org/). It uses the file [tasks.py](./tasks.py) for declaring tasks. In each task we can declare a series of cammands to execute. Finally we can do `invoke <task>` to carry out the desired task.
 
-We created tasks for updating the dependencies file (requirements.txt), installing new dependencies, running test and creating coverage reports. Later on in the project we will be able to create tasks for building and deploying the project.
+We created tasks for updating the dependencies file (requirements.txt), installing new dependencies, running tests, building running and testing microservices containers, etc. All tasks can be found in the file [tasks.py](./tasks.py).
 
 ### CI tools:
 
@@ -125,4 +127,25 @@ For TravisCI the file used is [.travis.yml](./.travis.yml). There we can specify
 
 For CircleCI the file used is [config.yml](./.circleci/config.yml). The concept is the same as in the travis file but with a different sintax. More information about both files can be found in their links.
 
- More information will be given as the course goes on.
+## Performance:
+### Images :
+Load performance measurements between containers using the Event microservice with 2 different base images (alpine and python:3.7-alpine) has been done. For this purpose we have used the tool [Taurus](https://gettaurus.org/) and used a reference [script with some modifications](/tests/performance/taurus_script.yml). Explanation about the script can be found in the in-line comments of the file. 
+
+The tests have been performend in local using a Intel Core i7-4790 CPU @ 3.60GHz × 8 CPU. 
+
+After pulling the required base images we have used this [dockerfile](/Dockerfile.events), changing only the FROM directive between alpine and python:3.7-alpine and deleting the python install line. Making this we creates 'events' image, with alpine and 'events-second' with 'python:3.7-alpine'.
+
+![Docker images for testing](img/perf_comparison_images.png "Docker images for testing")
+As we can see the image created with 'python:3.7-alpine' doubles the size of the other which is undesirable.
+Now we will run the microservice and perform a load test in both containers.
+![Containers up image](img/perf_comparison_containers.png "Containers up image")
+Measurements for 'events' image (base image: alpine):
+![events image (alpine) measurements](img/perf_comparison_results_alpine.png "events image (alpine) measurements")
+Measurements for 'events-second' image (base image: python:3.7-alpine):
+![events-second image (python:3.7-alpine) measurements](img/perf_comparison_results_python:alpine.png "events image (alpine) measurements")
+
+For the same load we can see that the container using alpine as base image performs slightly better in terms of RPS and also has a slightly lower response time. With this metrics we can then assure than the 'alpine' base image is better for our project.
+
+## Deployment:
+### Heroku:
+The Events microservice has been deployed to Heroku. The steps followed can be found in the [official documentation](https://devcenter.heroku.com/articles/git#prerequisites-install-git-and-the-heroku-cli), basically we just created a heroku app using the CLI, specify that it will be a containerized app and pushed our code to heroku. Additionally we have created a [heroku.yml](/heroku.yml) and enabled autodeploy for our app in order re-deploy the app everytime we make a push to our repository.
