@@ -62,9 +62,9 @@ class Notification:
         if not isinstance(scheduled_time, dt.datetime):
             raise AttributeError(
                 "Argument 'scheduled_time' in Notification must be of type datetime.datetime")
-        if not scheduled_time > dt.datetime.now():
-            raise ValueError(
-                "Argument 'scheduled time' in Notification must be grater than current time.")
+        # if not scheduled_time > dt.datetime.now():
+        #     raise ValueError(
+        #         "Argument 'scheduled time' in Notification must be grater than current time.")
 
         self.__scheduled_time = scheduled_time
 
