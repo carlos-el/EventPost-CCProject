@@ -3,4 +3,4 @@
 # the default CMD specified in the Dockerfile is used if no run section is created
 build:
   docker:
-    web: Dockerfile.events
+    web: Events.dockerfile

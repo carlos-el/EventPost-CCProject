@@ -47,15 +47,15 @@ def testContainers(c):
 @task
 def buildContainers(c):
     c.config.run.shell = proper_shell
-    c.run("docker build -f Dockerfile.events -t events_container .")
-    c.run("docker build -f Dockerfile.notifications -t notifications_container .")
+    c.run("docker build -f Events.dockerfile -t events_container .")
+    c.run("docker build -f Notifications.dockerfile -t notifications_container .")
 
 # runs in bg the containers with the microservices
 @task
 def runContainers(c):
     c.config.run.shell = proper_shell
     c.run("docker run --rm -dit -p 8000:8080 events_container")
-    c.run("docker run --rm -dit -p 8000:8080 notifications_container")
+    c.run("docker run --rm -dit -p 8001:8080 notifications_container")
 
 # uploads the docker images created to Github repository registry 
 @task
