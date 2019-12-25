@@ -30,7 +30,7 @@ class NotificationsResource(object):
         # Load notification from json data
         try:
             nt = json.loads(body, object_hook=notification_json_decoder)
-        except (KeyError, TypeError, IndexError, AttributeError, ValueError):
+        except:
             resp.status = falcon.HTTP_422
             resp.body = json.dumps(
                 {"error": "Error in data provided in request body."})

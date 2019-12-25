@@ -11,7 +11,7 @@ class NotificationResource(object):
     def on_get(self, req, resp, id):
         # Check id exist
         try:
-            nt = self._dator.get_by_id(int(id))
+            nt = self._dator.get_by_id(id)
         except ValueError:
             resp.status = falcon.HTTP_NOT_FOUND
             resp.body = json.dumps(
@@ -23,7 +23,7 @@ class NotificationResource(object):
     def on_put(self, req, resp, id):
         # Check that the notification specified exist
         try:
-            nt = self._dator.get_by_id(int(id))
+            nt = self._dator.get_by_id(id)
         except ValueError:
             resp.status = falcon.HTTP_NOT_FOUND
             resp.body = json.dumps(
@@ -50,6 +50,6 @@ class NotificationResource(object):
             return resp
 
         # Create the edited notification checking that the id is right
-        new_nt = Notification(nt.get_subject(), nt.get_content(), nt.get_to_mail(), nt.get_scheduled_time(), int(id))
+        new_nt = Notification(nt.get_subject(), nt.get_content(), nt.get_to_mail(), nt.get_scheduled_time(), id)
         # Save edited event
         self._dator.save(new_nt)

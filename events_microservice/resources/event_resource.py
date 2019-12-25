@@ -11,7 +11,7 @@ class EventResource(object):
     def on_get(self, req, resp, id):
         # Check id exist
         try:
-            ev = self._dator.get_by_id(int(id))
+            ev = self._dator.get_by_id(id)
         except ValueError:
             resp.status = falcon.HTTP_NOT_FOUND
             resp.body = json.dumps(
@@ -23,7 +23,7 @@ class EventResource(object):
     def on_put(self, req, resp, id):
         # Check that the event specified exist
         try:
-            ev = self._dator.get_by_id(int(id))
+            ev = self._dator.get_by_id(id)
         except ValueError:
             resp.status = falcon.HTTP_NOT_FOUND
             resp.body = json.dumps(
@@ -51,6 +51,6 @@ class EventResource(object):
 
         # Create the edited event checking that the id is right
         new_ev = Event(ev.get_title(), ev.get_description(), ev.get_date(
-        ), ev.get_time(), ev.get_place(), ev.get_organizer(), ev.get_topics(), int(id))
+        ), ev.get_time(), ev.get_place(), ev.get_organizer(), ev.get_topics(), id)
         # Save edited event
         self._dator.save(new_ev)
