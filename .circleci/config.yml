@@ -10,8 +10,9 @@ jobs:
       #install dependencies and run tests
       - checkout 
       - run: 
-          name: install dependencies and run test
+          name: install dependencies
           command: | 
+            sudo apt-get install mongodb
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
@@ -31,24 +32,7 @@ jobs:
       - run: 
           name: install dependencies
           command: | 
-            pip3 install virtualenv
-            virtualenv venv
-            . venv/bin/activate
-            pip3 install -r requirements.txt
-      - run: 
-          name: run tests
-          command: |
-            . venv/bin/activate
-            invoke test
-
-  build-367:
-    docker:
-      - image: circleci/python:3.6.7
-    steps:
-      - checkout 
-      - run: 
-          name: install dependencies
-          command: | 
+            sudo apt-get install mongodb
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
