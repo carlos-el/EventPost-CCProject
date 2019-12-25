@@ -6,13 +6,13 @@ jobs:
     docker:
       #version of the docker image
       - image: circleci/python:latest
+      - image: circleci/mongo:4.0.1
     steps:
       #install dependencies and run tests
       - checkout 
       - run: 
           name: install dependencies
           command: | 
-            sudo apt-get install -y mongodb-org
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
@@ -27,12 +27,12 @@ jobs:
   build-372:
     docker:
       - image: circleci/python:3.7.2
+      - image: circleci/mongo:4.0.1
     steps:
       - checkout 
       - run: 
           name: install dependencies
           command: | 
-            sudo apt-get install -y mongodb-org
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
