@@ -12,7 +12,7 @@ jobs:
       - run: 
           name: install dependencies
           command: | 
-            sudo apt-get install mongodb
+            sudo apt-get install -y mongodb-org
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
@@ -32,7 +32,7 @@ jobs:
       - run: 
           name: install dependencies
           command: | 
-            sudo apt-get install mongodb
+            sudo apt-get install -y mongodb-org
             pip3 install virtualenv
             virtualenv venv
             . venv/bin/activate
