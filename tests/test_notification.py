@@ -7,7 +7,7 @@ sys.path.append(os.path.abspath('./'))
 import datetime as dt
 from notifications_microservice.models.notification import Notification
 
-id = 1
+id = "abcabcabcabcabcabcabcabc"
 subject = "test subject"
 content = "test content " + 'a'*30 
 to_mail = "testmail@testmail.com"
@@ -18,9 +18,9 @@ def test_id():
     assert n.get_id() == id, "Error in Id assignment"
 
     with pytest.raises(AttributeError):
-        _ = Notification(subject, content, to_mail, scheduled_time, "test")
+        _ = Notification(subject, content, to_mail, scheduled_time, 1)
     with pytest.raises(ValueError):
-        _ =  Notification(subject, content, to_mail, scheduled_time, -1)
+        _ =  Notification(subject, content, to_mail, scheduled_time, "")
 
 
 

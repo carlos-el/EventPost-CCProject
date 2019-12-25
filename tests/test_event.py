@@ -9,7 +9,7 @@ import datetime as dt
 import pytest
 
 
-id = 1
+id = "abcabcabcabcabcabcabcabc"
 title = "test title"
 description = "test description " + 'a'*60
 date = dt.date.today()
@@ -25,9 +25,9 @@ def test_set_id():
 
     with pytest.raises(AttributeError):
         _ = Event(title, description, date, time,
-                  place, organizer, topics, "test")
+                  place, organizer, topics, 1)
     with pytest.raises(ValueError):
-        _ = Event(title, description, date, time, place, organizer, topics, -1)
+        _ = Event(title, description, date, time, place, organizer, topics, "")
 
 
 def test_set_organizer():
@@ -84,9 +84,6 @@ def test_set_date():
 
     with pytest.raises(AttributeError):
         _ = Event(title, description, None, time, place, organizer, topics)
-    with pytest.raises(ValueError):
-        _ = Event(title, description, dt.date(2000, 10, 10),
-                  time, place, organizer, topics)
 
 
 def test_set_time():

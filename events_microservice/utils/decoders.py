@@ -19,7 +19,7 @@ def event_json_decoder(json):
     organizer = ""
     place = ""
 
-    if 'id' in json.keys():
+    if '_id' in json.keys():
         id = json['id']
     if 'topics' in json.keys():
         topics = json['topics']

@@ -24,13 +24,13 @@ def test_get_events():
 
 def test_get_by_id():
     ed = EventDatorMock()
-    e = ed.get_by_id(1)
+    e = ed.get_by_id("aaaaaaaaaaaaaaaaaaaaaaa1")
 
-    assert e.get_id() == 1, "Error in event_dator_ mock, get_by_id()"
+    assert e.get_id() == "aaaaaaaaaaaaaaaaaaaaaaa1", "Error in event_dator_ mock, get_by_id()"
     with pytest.raises(ValueError):
-        _ = ed.get_by_id(100)
+        _ = ed.get_by_id("aaaaaaaaaaaaaaaaaaaaaaaa")
     with pytest.raises(AttributeError):
-        _ = ed.get_by_id("1")
+        _ = ed.get_by_id(1)
 
 
 def test_save():
@@ -39,17 +39,17 @@ def test_save():
     events = ed.get_all()
 
     assert len(events) == 6, "Error in event_dator_ mock, save()"
-    assert ed.get_by_id(5) == ev2, "Error in event_dator_ mock, save()"
+    assert ed.get_by_id("aaaaaaaaaaaaaaaaaaaaaaa5") == ev2, "Error in event_dator_ mock, save()"
 
 
 def test_delete_by_id():
     ed = EventDatorMock()
-    e = ed.get_by_id(5)
+    e = ed.get_by_id("aaaaaaaaaaaaaaaaaaaaaaa5")
     e2 = ed.delete_by_id(e.get_id())
 
     assert len(ed.get_all()) == 5, "Error in event_dator_ mock, delete_by_id()"
     assert e == e2, "Error in event_dator_ mock, delete_by_id()"
-    assert ed.delete_by_id(-1) == None, "Error in event_dator_ mock, delete_by_id()"
+    assert ed.delete_by_id("aaaaaaaaaaaaaaaaaaaaaaaa") == None, "Error in event_dator_ mock, delete_by_id()"
     with pytest.raises(AttributeError):
-        _ = ed.delete_by_id("1")
+        _ = ed.delete_by_id(1)
 
