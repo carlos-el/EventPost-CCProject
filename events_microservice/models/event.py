@@ -17,11 +17,11 @@ class Event:
     # private setters
 
     def __set_id(self, id):
-        if not isinstance(id, int) and id is not None:
-            raise AttributeError("Argument 'id' must be an int")
-        if isinstance(id, int) and id < 0:
+        if not isinstance(id, str) and id is not None:
+            raise AttributeError("Argument 'id' must be an str")
+        if isinstance(id, str) and len(id) != 24:
             raise ValueError(
-                "Argument 'id' must be a positive int")
+                "Argument 'id' must be a str with 24 chars")
 
         self.__id = id
 
@@ -73,8 +73,6 @@ class Event:
         if not isinstance(date, dt.date):
             raise AttributeError(
                 "Argument 'date' must be of type datetime.date")
-        if date < dt.date.today():
-            raise ValueError("Argument 'date' can not be a past date")
 
         self.__date = date
 
@@ -119,3 +117,9 @@ class Event:
 
     def get_topics(self):
         return self.__topics
+
+
+    def to_json(self):
+        return {"id":self.__id, "title":self.__title, "description":self.__description, 
+        "date":self.__date.isoformat(), "time":self.__time.isoformat(), "place":self.__place,
+        "organizer":self.__organizer, "topics":self.__topics}

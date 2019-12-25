@@ -14,11 +14,11 @@ class Notification:
 
     # setters
     def __set_id(self, id):
-        if not isinstance(id, int) and id is not None:
-            raise AttributeError("Argument 'id' must be an int")
-        if isinstance(id, int) and id < 0:
+        if not isinstance(id, str) and id is not None:
+            raise AttributeError("Argument 'id' must be an str")
+        if isinstance(id, str) and len(id) != 24:
             raise ValueError(
-                "Argument 'id' must be a positive int")
+                "Argument 'id' must be a positive str")
 
         self.__id = id
 
@@ -84,3 +84,8 @@ class Notification:
 
     def get_scheduled_time(self):
         return self.__scheduled_time
+
+    
+    def to_json(self):
+        return {"id":self.__id, "subject":self.__subject, "content":self.__content, 
+        "to_mail":self.__to_mail, "scheduled_time":self.__scheduled_time.isoformat()}
