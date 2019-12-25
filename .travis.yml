@@ -14,6 +14,7 @@ python:
 # specify the docker use
 services:
   - docker
+  - mongodb
 
 # install dependencies
 install:
