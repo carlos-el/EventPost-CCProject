@@ -18,7 +18,7 @@ class EventResource(object):
                 {"error": "Resource with specified Id does not exist."})
             return resp
 
-        resp.body = json.dumps(ev.__dict__, default=serialize)
+        resp.body = json.dumps(ev.to_json(), default=serialize)
 
     def on_put(self, req, resp, id):
         # Check that the event specified exist
@@ -53,4 +53,18 @@ class EventResource(object):
         new_ev = Event(ev.get_title(), ev.get_description(), ev.get_date(
         ), ev.get_time(), ev.get_place(), ev.get_organizer(), ev.get_topics(), id)
         # Save edited event
-        self._dator.save(new_ev)
+        puted_ev = self._dator.save(new_ev)
+        resp.body = json.dumps(puted_ev.to_json(), default=serialize)
+    
+    def on_delete(self, req, resp, id):
+        # Try to delete
+        ev = self._dator.delete_by_id(id)
+
+        # If returns none the id didnt exist
+        if ev is None:
+            resp.status = falcon.HTTP_NOT_FOUND
+            resp.body = json.dumps(
+                {"error": "Resource with specified Id does not exist."})
+            return resp
+        else:
+            resp.body = json.dumps(ev.to_json(), default=serialize)

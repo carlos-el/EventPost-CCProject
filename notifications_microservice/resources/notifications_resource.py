@@ -14,7 +14,7 @@ class NotificationsResource(object):
 
         # Format notifications to json using our serialize funtion
         resp.body = json.dumps(
-            [nt.__dict__ for nt in notifications], default=serialize)
+            [nt.to_json() for nt in notifications], default=serialize)
 
     def on_post(self, req, resp):
         # Read request body
@@ -37,7 +37,8 @@ class NotificationsResource(object):
             return resp
 
         # Save notification
-        self._dator.save(nt) 
+        posted_nt = self._dator.save(nt) 
+        resp.body = json.dumps(posted_nt.to_json(), default=serialize)
         resp.status = falcon.HTTP_CREATED
 
         

@@ -14,7 +14,7 @@ class EventsResource(object):
 
         # Format events to json using our serialize funtion
         resp.body = json.dumps(
-            [ev.__dict__ for ev in events], default=serialize)
+            [ev.to_json() for ev in events], default=serialize)
 
     def on_post(self, req, resp):
         # Read request body
@@ -37,8 +37,10 @@ class EventsResource(object):
             return resp
 
         # Save event
-        self._dator.save(ev) 
+        posted_ev = self._dator.save(ev) 
+        resp.body = json.dumps(posted_ev.to_json(), default=serialize)
         resp.status = falcon.HTTP_CREATED
+
 
         
         

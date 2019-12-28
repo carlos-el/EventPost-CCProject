@@ -18,7 +18,7 @@ class NotificationResource(object):
                 {"error": "Resource with specified Id does not exist."})
             return resp
 
-        resp.body = json.dumps(nt.__dict__, default=serialize)
+        resp.body = json.dumps(nt.to_json(), default=serialize)
 
     def on_put(self, req, resp, id):
         # Check that the notification specified exist
@@ -51,5 +51,19 @@ class NotificationResource(object):
 
         # Create the edited notification checking that the id is right
         new_nt = Notification(nt.get_subject(), nt.get_content(), nt.get_to_mail(), nt.get_scheduled_time(), id)
-        # Save edited event
-        self._dator.save(new_nt)
+        # Save edited notification
+        puted_nt = self._dator.save(new_nt)
+        resp.body = json.dumps(puted_nt.to_json(), default=serialize)
+
+    def on_delete(self, req, resp, id):
+        # Try to delete
+        nt = self._dator.delete_by_id(id)
+
+        # If returns none the id didnt exist
+        if nt is None:
+            resp.status = falcon.HTTP_NOT_FOUND
+            resp.body = json.dumps(
+                {"error": "Resource with specified Id does not exist."})
+            return resp
+        else:
+            resp.body = json.dumps(nt.to_json(), default=serialize)
