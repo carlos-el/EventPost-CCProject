@@ -80,3 +80,18 @@ def test_put_event(client):
 
     assert resp.status == falcon.HTTP_422
     assert resp.headers['Content-Type'] == "application/json"
+
+
+def test_delete_event(client):
+    data = events_collection.find_one()
+    resp = client.simulate_request(
+        method='DELETE', path='/events/' + str(data["_id"]))
+
+    assert resp.status == falcon.HTTP_OK
+    assert resp.headers['Content-Type'] == "application/json"
+
+    resp = client.simulate_request(
+        method='DELETE', path='/events/aaaaaaaaaaaaaaaaaaaaaaaa')
+
+    assert resp.status == falcon.HTTP_NOT_FOUND
+    assert resp.headers['Content-Type'] == "application/json"
