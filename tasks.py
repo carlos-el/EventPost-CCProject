@@ -73,3 +73,6 @@ def startServer(c, host, port, service):
     c.config.run.shell = proper_shell
     c.run("gunicorn -b %s:%s %s &" %(host, port, service))
 
+@task 
+def populateHerokuEventsApp(c):
+    c.run("python3 fixtures.py https://eventpost.herokuapp.com/events events")
