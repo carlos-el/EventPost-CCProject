@@ -1,3 +1,4 @@
+# Scripts for populating databases of our microservices
 import sys
 import json
 import requests 
@@ -15,6 +16,7 @@ if len(sys.argv) is not 3 or sys.argv[2] not in allowed_fixtures:
 URL = sys.argv[1]
 fixture = sys.argv[2]
 
+# Creates events
 def define_events_fixture():
     elements = []
 
@@ -26,6 +28,7 @@ def define_events_fixture():
     
     return elements
 
+#Cretes notifications
 def define_notifications_fixture():
     elements = []
 
