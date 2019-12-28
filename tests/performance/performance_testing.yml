@@ -1,0 +1,133 @@
+# Define and execution test scenarios
+execution:
+- scenario: events-get
+  # How many requests should be issued at the same time (concurrency from different scenarios stacks)
+  concurrency: 7
+  # Maximum number of requests per second for the scenario
+  throughput: 3000
+  # Delay to reach maximun concurrency
+  ramp-up: 5s
+  # How much time should the load be holded.
+  hold-for: 30s
+  # How many steps to take before reaching concurrency.
+  steps: 5
+- scenario: events-post-put-delete
+  concurrency: 3
+  throughput: 1000
+  ramp-up: 5s
+  hold-for: 30s
+  steps: 5
+
+# Define the scenarios
+scenarios:
+  # Scenario for making GET requests to the service, it performs one request for 
+  # getting all the events in the system and 5 requests for getting specific events
+  events-get:
+    # Global parameters.
+    # Base URL we are going to use
+    default-address: http://localhost:8000
+    # Disable simulated browser caching
+    store-cache: false
+    # Maximun time of 4s waiting for a response after a request is sent
+    timeout: 4s
+    # Define encoding
+    content-encoding: utf-8
+    requests:
+    # Define a request to get all the events in the database
+    - url: /events # Path appended to the default url 
+      method: GET
+      # From the response we extract all ids of the events (using regular expresions)
+      extract-regexp:
+        id: # Name of the variable where the id value will be stored
+          subject: body  # Specify where should the regex be applied (body of the response)
+          regexp: \"id\"\:\ \"(\w+)\"\,\ \" # Regular expresion applied to the response body
+          match-no: -1  # Specifies which match use if multiple values match, (-1 means catch all. Variables names will be id_1, id_2...)
+          default: NOT_FOUND  # Default value to use when regex does not match anything
+    # Make 5 more GET requests to specific events using the ids get from the previous request.
+    - url: /events/${id_1}
+    - url: /events/${id_2}
+    - url: /events/${id_3}
+    - url: /events/${id_4}
+    - url: /events/${id_5}
+
+  # Scenario for making POST, PUT and DELETE requests to the services, it performs one POST request 
+  # creating an event, then the same event is edited using a PUT request and finally deleted using 
+  # a DELETE request.
+  events-post-put-delete:
+    default-address: http://localhost:8000
+    store-cache: false
+    timeout: 6s
+    content-encoding: utf-8
+    requests:
+    # Define the POST request and get the new event id.
+    - url: /events
+      method: POST
+      headers: # Set headers of the request (only content-type needed)
+        Content-Type: application/json
+      # Set payload of the POST request (event to be added to the system)
+      body: '{"title": "Title Taurus test POST", "description": "Description Taurus test, testing test test test test test", "date": "2020-12-12", "time": "20:50:12"}'
+      # The POST request returns the created event in the response so we can obtain its id directly.
+      extract-regexp:
+        post_id:
+          subject: body 
+          regexp: \"id\"\:\ \"(\w+)\"\,\ \"
+          match-no: 1
+          default: NOT_FOUND 
+    # Define the PUT request to be sent using the id of the previously created event.
+    - url: /events/${post_id}
+      method: PUT
+      headers:
+        Content-Type: application/json
+      # Payload for editing the event
+      body: '{"title": "Title Taurus test PUT", "description": "Description Taurus test, testing test test test test test", "date": "2020-12-12", "time": "20:50:12"}'
+    # Define the DELETE request to be sent using the id of the previously created event.
+    - url: /events/${post_id}
+      method: DELETE
+
+  ################################
+  # GET scenario for notifications
+  notifications-get:
+    default-address: http://localhost:8001
+    store-cache: false
+    timeout: 4s
+    content-encoding: utf-8
+    requests:
+    - url: /notifications
+      method: GET
+      extract-regexp:
+        id: 
+          subject: body 
+          regexp: \"id\"\:\ \"(\w+)\"\,\ \" 
+          match-no: -1 
+          default: NOT_FOUND 
+    - url: /notifications/${id_1}
+    - url: /notifications/${id_2}
+    - url: /notifications/${id_3}
+    - url: /notifications/${id_4}
+    - url: /notifications/${id_5}
+
+  # POST-PUT-DELETE scenario for notifications
+  notifications-post-put-delete:
+    default-address: http://localhost:8001
+    store-cache: false
+    timeout: 6s
+    content-encoding: utf-8
+    requests:
+    - url: /notifications
+      method: POST
+      headers: 
+        Content-Type: application/json
+      body: '{"subject": "Subject test Taurus POST", "content": "Content Taurus POST, testing test test test test test test", "to_mail":"mail@mail.es", "scheduled_time":"2019-12-28T12:58:15"}'
+      extract-regexp:
+        post_id:
+          subject: body 
+          regexp: \"id\"\:\ \"(\w+)\"\,\ \"
+          match-no: 1
+          default: NOT_FOUND 
+    - url: /notifications/${post_id}
+      method: PUT
+      headers:
+        Content-Type: application/json
+      body: '{"subject": "Subject test Taurus PUT", "content": "Content Taurus PUT, testing test test test test test test", "to_mail":"mail@mail.es", "scheduled_time":"2019-12-28T12:58:15"}'
+    - url: /notifications/${post_id}
+      method: DELETE
