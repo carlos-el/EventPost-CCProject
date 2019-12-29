@@ -4,19 +4,23 @@
 The idea for this project is to develop a microservices based application for the cloud.
 It will provide a discovering and management system for social events along with the possiblility of programming email-based notification for the desired events as reminders.
 
-## Usage:
+## Requirements and Usage:
 
-- Previous requirements: `Docker`
-- Python version: `3.5 - latest`
+- Previous requirements: 
+    - `Docker`
+    - `python 3.6 - 3.8`
 - Install: 
     - `pip3 install invoke`
     - `invoke installDependencies`
-    - `invoke installDockerCompose`
-- Build: `invoke buildContainers`
+- Build: 
+    - `invoke buildContainers`
 - Test: 
     - `invoke test`
     - `testContainers`
-- Coverage: `invoke coverage`
+- Coverage: 
+    - `invoke coverage`
+- Run: 
+    - `invoke runContainers`
 
 ## Architecture:
 As stated before, we will be using a microservices based architecture with one microservice per entity in the system and one as task dispatcher. The microservices needed arise from decomposing our system using Domain Driven Design subdomains. The microservices developed to achieve our goal are the following:
@@ -127,8 +131,28 @@ For TravisCI the file used is [.travis.yml](./.travis.yml). There we can specify
 
 For CircleCI the file used is [config.yml](./.circleci/config.yml). The concept is the same as in the travis file but with a different sintax. More information about both files can be found in their links.
 
+## Docker
+The base image choosen for the containers has been [bitnami/minideb](https://hub.docker.com/r/bitnami/minideb/), mainly because its ease of use, more information about this in the following section.
+
+We have until now 2 microservices so we will be running 2 containers. Dockerfiles for creating them are the following, they include explaining commentaries. [Events Dockerfile](./Events.dockerfile). [Notifications Dockerfile](./Notifications.dockerfile)
+
+A docker-compose file has been created for speeding up container management in development [docker-compose file](./docker-compose.yml). When the docker-compose file is executed using `docker-compose up -d` with success both microservices will be ready to receive requests.
+
+#### Containers:
+The link to the DockerHub containers is the following:
+
+Contenedor: https://hub.docker.com/r/carlosel/eventpost-cc
+
+Additionally the the containers have been uploaded to GitHub packages in the following URLs:
+
+- https://github.com/carlos-el/EventPost-CCProject/packages/63507
+
+- https://github.com/carlos-el/EventPost-CCProject/packages/63509
+
+Both registries auto-update when there is a push to GitHub thanks to travis.
+
 ## Performance:
-### Images :
+### Images:
 Load performance measurements between containers using the Event microservice with 2 different base images (alpine and python:3.7-alpine) has been done. For this purpose we have used the tool [Taurus](https://gettaurus.org/) and used a reference [script with some modifications](/tests/performance/taurus_script.yml). Explanation about the script can be found in the in-line comments of the file. 
 
 The tests have been performend in local using a Intel Core i7-4790 CPU @ 3.60GHz × 8 CPU. 
@@ -146,6 +170,45 @@ Measurements for 'events-second' image (base image: python:3.7-alpine):
 
 For the same load we can see that the container using alpine as base image performs slightly better in terms of RPS and also has a slightly lower response time. With this metrics we can then assure than the 'alpine' base image is better for our project.
 
+Later on we required the installation of MongoDB in the container. Alpine4.0 does not supports MongoDB and a lot of problems arise when trying to install and execute it so we changed to a similar debian image, 'bitnami/minideb' it is not as small as alpine (67MB) but supports all the applications we need.
+
+### Performance testing:
+Performance testing has been carried on using Taurus with Jmeter as executor. A [taurus script](/tests/performance/performance_testing.yml) has been creted for testing both microservices. The script contains auto-explainatory annotations but basically it consist of the following:
+- Two scenarios for each microservice:
+    - GET-Scenario: Performs one GET request to obtain all resources in the system, gets 5 ids of the resources obtained and performs a GET request to each of this specific ids. In total it contains a cycle of 6 GET request to hte microservice.
+    - POST-PUT-DELETE Scenario: Makes a POST request to the microservice creating a new resource, then it retrieves the id of the new resource created abd performs a PUT and a DELETE request to this specific resource previously created. It Contains acycle of 3 requests, POST, PUT and DELETE, in taht order.   
+- Taurus cache simulation is disabled for all scenarios so it does not give a better performance than it should.
+- The execution section uses both scenarios of only one microservice at the same time trying to simulate a real load.
+    - For the GET scenario we have used a throughput of 3000 and a concurrency of 7. For the POST-PUT-DELETE scenario we have used a throughput of 1000 and a concurrency of 3. 
+        - In Taurus throughput and concurrency of scenarios executed at the same time stacks so finally we get a total throughput of 4000 (being 75% GET requests and 25% a mix of POST, PUT and DELETE requests) with a concurrency of 10. It tries to simulates the normal schema load that this microservice could receive in production. Notice that the throughput is set to 4000 so this does not become a limitation for the test.
+    
+#### Optimization:
+In order to achieve a good performance two actions have been performed:
+- Gunicorn workers at server start up have been set to 7 (this is done in the [dockerfile](/Events.dockerfile) CMD command) in an attempt to be able to handle 10 cocache ncurrent user requests.
+- A cache module called [falcon-caching](https://falcon-caching.readthedocs.io/en/latest/) has been added to the Falcon web framework in order to improve requests prosecution. It just requires setting the type of cache desired in the app module and adding a decorator to the resources classes.
+
+#### Results:
+Results obtained from performing this tests over the Events microservice in a local container are the following:
+
+As we can see for 10 concurrent users and the scheme of requests explained previously the Events microservice can handle up to 2000 RPS with a very low response time and no errors.
+![Performance Testing Events concurrency 10](/docs/img/pt_events_default.png "Events MS result with 10 concurrent users.")
+
+In the case of the Notifications Microservice the result are very similar. After all both microservice manage very light resources.
+![Performance Testing Notifications concurrency 10](/docs/img/pt_notifications_default.png "Notifications MS result with 10 concurrent users.")
+
+Finally to test the service limits concurrency has been incremented several times.
+The image below shows how with 100 concurrent users the RPS decrese is irrelevant, however the performance decrease in the response time is remarkable.
+![Performance Testing Events concurrency 100](/docs/img/pt_events_100cc.png "Events MS result with 100 concurrent users.")
+
+The microservice starts to fail with 200 concurrent users and a combined throughput of 4000 from both scenarios. Also tests with 100 concurrent users and a combined throughput of 10000 shows a decrese of the RPS to 1600.
+![Performance Testing Events concurrency 200](/docs/img/pt_events_200cc.png "Events MS result with 200 concurrent users.")
+
+
 ## Deployment:
 ### Heroku:
 The Events microservice has been deployed to Heroku. The steps followed can be found in the [official documentation](https://devcenter.heroku.com/articles/git#prerequisites-install-git-and-the-heroku-cli), basically we just created a heroku app using the CLI, specify that it will be a containerized app and pushed our code to heroku. Additionally we have created a [heroku.yml](/heroku.yml) and enabled autodeploy for our app in order re-deploy the app everytime we make a push to our repository.
+
+Link to the deployed app:
+- https://eventpost.herokuapp.com/events
+
+This service can be populated using the command `invoke populateHerokuEventsApp` available at [tasks.py](/tasks.py).
