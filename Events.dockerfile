@@ -16,7 +16,7 @@ RUN apt update && apt upgrade && install_packages gnupg wget \
     && apt update \
     # install more dependencies
     && install_packages python3 python3-pip mongodb-org \
-    && pip3 install falcon gunicorn pymongo \
+    && pip3 install falcon gunicorn pymongo falcon-caching \
     && useradd -m docker_user \
     # adds non-root user and creates directories for mongodb with the right permisssions.
     && mkdir -p /home/docker_user/mongodb/db /home/docker_user/mongodb/log \
@@ -30,4 +30,4 @@ COPY events_microservice /home/docker_user/events_microservice
 WORKDIR /home/docker_user
 
 # Starts the app and starts mongo daemon in the back (--fork) and specifying log file and database folder.
-CMD mongod --fork --logpath ~/mongodb/log/mongodb.log --dbpath ~/mongodb/db && gunicorn -w 4 -b 0.0.0.0:${PORT} events_microservice.app
+CMD mongod --fork --logpath ~/mongodb/log/mongodb.log --dbpath ~/mongodb/db && gunicorn -w 7 -b 0.0.0.0:${PORT} events_microservice.app
