@@ -1,9 +1,10 @@
 import falcon
 import json
+from events_microservice import settings
 from events_microservice.models.event import Event
 from events_microservice.utils.decoders import serialize, event_json_decoder
 
-
+@settings.cache.cached(timeout=1200)
 class EventResource(object):
     def __init__(self, dator):
         self._dator = dator

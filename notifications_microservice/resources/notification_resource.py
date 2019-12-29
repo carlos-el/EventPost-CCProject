@@ -1,9 +1,10 @@
 import falcon
 import json
+from notifications_microservice import settings
 from notifications_microservice.models.notification import Notification
 from notifications_microservice.utils.decoders import serialize, notification_json_decoder
 
-
+@settings.cache.cached(timeout=1200)
 class NotificationResource(object):
     def __init__(self, dator):
         self._dator = dator
