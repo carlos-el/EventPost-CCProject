@@ -52,7 +52,7 @@ In order to achieve a good performance two actions have been performed:
 - A cache module called [falcon-caching](https://falcon-caching.readthedocs.io/en/latest/) has been added to the Falcon web framework in order to improve requests prosecution. It just requires setting the type of cache desired in the app module and adding a decorator to the resources classes.
 
 ## Performance testing:
-Prestaciones: /tests/performance/performance_testing.yml
+Prestaciones: performance_testing.yml
 
 Performance testing has been carried on using Taurus with Jmeter as executor. A [taurus script](/tests/performance/performance_testing.yml) has been creted for testing both microservices. The script contains auto-explainatory annotations but basically it consist of the following:
 - Two scenarios for each microservice:
