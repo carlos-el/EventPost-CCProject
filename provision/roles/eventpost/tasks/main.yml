@@ -1,0 +1,4 @@
+# Role for installing Docker
+# Imports tasks from 'install_docker.yml'
+- name: Install Docker
+  import_tasks: ./roles/eventpost/tasks/install_docker.yml

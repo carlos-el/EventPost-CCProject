@@ -1,0 +1,31 @@
+# This script is a slight modification of the one showed at DigitalOcena tutorial: 
+# REFERENCE: https://www.digitalocean.com/community/tutorials/how-to-use-ansible-to-install-and-set-up-docker-on-ubuntu-18-04#the-playbook-contents
+
+# Tasks block for installing Docker
+- name: Install Docker
+  block:
+    # Task for installingg packages required by Docker
+    - name: Install Docker required packages
+      apt: name={{ item }} state=latest update_cache=yes
+      loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'software-properties-common', 'python3-pip']
+
+    # Docker module for python needed for Ansible
+    - name: Install Docker Module for Python
+      pip:
+        name: docker
+
+    # Add Docker GPG Key 
+    - name: Add Docker GPG apt Key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    # Add Docker repository
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    # Finally, install docker-ce
+    - name: Update apt and install docker-ce
+      apt: update_cache=yes name=docker-ce state=latest

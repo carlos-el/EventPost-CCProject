@@ -1,0 +1,30 @@
+# Tasks block for terminating eventpost instances in AWS
+# Instances are created with a certain tag so they can then be retireved and managed.
+- name: Terminate EvenPost instances
+  block:
+    # Task for getting the desired instances by using their tags,
+    - name: Get AWS EvenPost instances
+      ec2_instance_info: 
+        # Tags 
+        filters:
+          "tag:Name": ["events", "notifications"]
+        # Specify credential
+        aws_access_key: "{{aws_access_key_id}}"
+        aws_secret_key: "{{aws_secret_access_key}}"
+        security_token: "{{aws_session_token}}"
+      # Register instances info
+      register: old_ec2
+
+    # Task for terminating instances based on their previously adquired IDs.
+    - name: Terminate AWS EventPost instances
+      ec2: 
+        # Specify 'absent' state (it terminates the instances)
+        state: absent
+        # Specify instances to terminate
+        instance_ids: "{{item.instance_id}}"
+        region: us-east-1
+        aws_access_key: "{{aws_access_key_id}}"
+        aws_secret_key: "{{aws_secret_access_key}}"
+        security_token: "{{aws_session_token}}"
+      with_items:
+        - "{{ old_ec2.instances }}"
