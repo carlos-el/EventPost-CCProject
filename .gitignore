@@ -102,3 +102,6 @@ npm-debug.log
 build
 package-lock.json
 test/*.log
+
+# Ansible vault file
+pass.yml
