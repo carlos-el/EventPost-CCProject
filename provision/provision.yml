@@ -1,0 +1,136 @@
+# Script for provisioning AWS virtual machines
+
+# Use Localhost (current machine) for starting EC2 instances, add their DNS 
+# to an ansible host and wait until they are ready to be connected.
+- hosts: localhost
+  # Disable gathering remote hosts variables, we do not need any info about the localhost that we dont have already.
+  gather_facts: False
+  # Define tasks to perform
+  tasks:
+    # Terminate (stop and remove) previous instances started with the same purpose.
+    - name: Terminate old EvenPost instances
+      # Imports desired task.
+      import_tasks: ./roles/eventpost/tasks/terminate_eventpost_instances.yml
+      
+    # Task for starting EC2 instances
+    - name: Start AWS new ec2 instances
+      ec2: 
+        # Define a certain tag so we can identify the instance later and when terminating it.
+        instance_tags:
+          Name: "{{ item }}"
+        # Type of instance. (t2.micro is the free tier usage instance for educational accounts)
+        instance_type: t2.micro
+        # Image to use in the instance, this corresponds to UbuntuServer 18.04.
+        image: ami-04b9e92b5572fa0d1
+        # Security group to use in the instances, this one allows ports 22, 80 and 443.
+        group: confDefault
+        # AWS key to connect to the newly created instances.
+        key_name: awseducate2
+        count: 1
+        region: us-east-1
+        wait: yes
+        # AWS credentials (stored using ansible vault) so the instances can be started 
+        aws_access_key: "{{aws_access_key_id}}"
+        aws_secret_key: "{{aws_secret_access_key}}"
+        security_token: "{{aws_session_token}}"
+      # Register the information of the newly created instances in a variable
+      register: ec2_list
+      # Names of the instances
+      with_items:
+        - events
+        - notifications
+
+    # Adds the previously created instances to an ansible host group 
+    - name: Add new instances to host group
+      add_host:
+        # Specify instances DNS to add
+        hostname: "{{ item.public_dns_name }}"
+        # Group to be added to.
+        group: amazonservers
+        # Additional variable for each DNS describing it.
+        service: "{{item.tags.Name}}"
+      # Get instances info from the previously created variable and loop.
+      with_items:
+        - "{{ ec2_list.results | map(attribute='instances') | sum(start=[]) | list }}"
+
+    # Wait until all the instances can be addressed using SSH. 
+    - name: Wait for SSH to start
+      wait_for:
+        host: "{{ item.public_dns_name }}"
+        port: 22
+        delay: 10
+        timeout: 60
+        state: started
+      with_items:
+        - "{{ ec2_list.results | map(attribute='instances') | sum(start=[]) | list }}"
+
+
+# Host for deploying the microservices in the new instances that were added to the 'amazonserver' host.
+- hosts: amazonservers
+  gather_facts: False
+  # Use privileges when executing the following tasks in the instances
+  become: yes
+
+  tasks:
+    # Installs docker importing a previously defined block of tasks.
+    - name: Install Docker
+      import_tasks: ./roles/eventpost/tasks/install_docker.yml
+
+    # Pulls the docker image of the right microservice
+    - name: Pulls Docker image from registry
+      docker_image:
+        name: carlosel/eventpost-cc:{{hostvars[inventory_hostname].service}}-latest
+        source: pull
+        force_source: yes
+
+    # Create and start container using the previously downloaded image.
+    - name: Create container from image
+      docker_container:
+        name: events
+        image: carlosel/eventpost-cc:{{hostvars[inventory_hostname].service}}-latest
+        # Ensure the container is in a started state.
+        state: started
+        # Ports to map in the host
+        published_ports:
+          - "80:8080"
+
+# In the Localhost again, execute a series of scripts to populate the microservices created
+- hosts: localhost
+  gather_facts: False
+
+  # Ensure port 80 (used for receiving request) is already up in all instances.
+  tasks:
+    - name: Wait for Servers to start
+      wait_for:
+        host: "{{ item }}"
+        port: 80
+        delay: 10
+        timeout: 60
+        state: started
+      with_items:
+        - "{{ groups['amazonservers'] }}"
+      
+    # Execute a scripts that send requests to the microservices for populating their databases
+    - name: Populate Events microservice
+      command: python3 fixtures.py http://{{item}}/events events
+      args:
+        # Directory where fixtures.py is located
+        chdir: ./roles/eventpost/files
+      with_items:
+        - "{{ groups['amazonservers'] }}"
+      # Only executes the script with the right microservice.
+      when: hostvars[item].service == "events"
+    
+    - name: Populate Notifications microservice
+      command: python3 fixtures.py http://{{item}}/notifications notifications
+      args:
+        chdir: ./roles/eventpost/files
+      with_items:
+        - "{{ groups['amazonservers'] }}"
+      when: hostvars[item].service == "notifications"
+
+    # Print DNS services so we can easily address them later.
+    - name: Print instances DNS nasmes
+      debug: var=groups['amazonservers']
+
+      

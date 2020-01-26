@@ -1,0 +1,12 @@
+# Define variable for a specific host_group. Here we set the location of the 
+# SSH key to use when connecting to this group instances and the defult user
+# used in the instances.
+
+# Also, the host group is empty because instances DNS will be added at 
+# runtime using Ansible capabilities
+
+[amazonservers:vars]
+ansible_ssh_private_key_file=/home/carlos/.ssh/awseducate2.pem
+ansible_user=ubuntu
+
+[amazonservers]
