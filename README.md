@@ -38,7 +38,10 @@ A container has been deployed in Heroku: https://eventpost.herokuapp.com/events
 
 More information about containers available [here](/docs/index.md#docker).
 
+## Performance testing:
+Prestaciones: performance_testing.yml
 
+More information about this available [here](/docs/index.md#performance-testing)
 
 ## Deployment to AWS EC2 using Ansible:
 In this section we will describe how to deploy our dockerized application using AWS EC2 instances and Ansible to provide them. Steps for setting up Ansible and the AWS CLI so they can work together can be found [here](/docs/index.md#setting-up-aws-cli-and-ansible).
