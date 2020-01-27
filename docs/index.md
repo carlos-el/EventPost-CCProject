@@ -8,7 +8,7 @@ It will provide a discovering and management system for social events along with
 
 - Previous requirements: 
     - `Docker`
-    - `python 3.6 - 3.8`
+    - `Python 3.6 - 3.8`
 - Install: 
     - `pip3 install invoke`
     - `invoke installDependencies`
@@ -20,7 +20,7 @@ It will provide a discovering and management system for social events along with
 - Coverage: 
     - `invoke coverage`
 - Run: 
-    - `invoke runContainers`
+    - `invoke runContainers` (starts containers) or `invoke runAWS` (virtual machines provisioning in AWS)
 
 ## Architecture:
 As stated before, we will be using a microservices based architecture with one microservice per entity in the system and one as task dispatcher. The microservices needed arise from decomposing our system using Domain Driven Design subdomains. The microservices developed to achieve our goal are the following:
@@ -151,27 +151,62 @@ Additionally the the containers have been uploaded to GitHub packages in the fol
 
 Both registries auto-update when there is a push to GitHub thanks to travis.
 
+## Deployment:
+### Heroku:
+The Events microservice has been deployed to Heroku. The steps followed can be found in the [official documentation](https://devcenter.heroku.com/articles/git#prerequisites-install-git-and-the-heroku-cli), basically we just created a heroku app using the CLI, specify that it will be a containerized app and pushed our code to heroku. Additionally we have created a [heroku.yml](/heroku.yml) and enabled autodeploy for our app in order re-deploy the app everytime we make a push to our repository.
+
+Link to the deployed app:
+- https://eventpost.herokuapp.com/events
+
+This service can be populated using the command `invoke populateHerokuEventsApp` available at [tasks.py](/tasks.py).
+
+### Deployment to AWS EC2 using Ansible for provisioning:
+In order to deploy our microservices using virtual machines we have used AWS EC2 service as well as Ansible for provisioning our instances.
+#### Setting up AWS CLI and Ansible:
+There are several steps that we have to complete for setting up our deployment environment:
+- First we have to install Ansible and AWS CLI. We installed Ansible using [pip](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-with-pip) as described in the official documentation as well as the [AWS CLI](https://docs.aws.amazon.com/es_es/cli/latest/userguide/install-cliv2-linux-mac.html).
+- The next step is configuring the AWS CLI to work with Ansible. In order to allow Ansible to use AWS CLI capabilities we have to let it read the AWS credentials using a safe method. An easy way to do that is with ['ansible-vault'](https://docs.ansible.com/ansible/latest/user_guide/vault.html). 
+    - First we create a encrypted file with `ansible-vault create foo.yml`. 
+    - Then we can simply set our encrypted variables in the file with `env EDITOR=nano ansible-vault edit provision/group_vars/all/pass.yml`. After that we will have access to our credentials in Ansible scripts (previous authenticatio via pasword before executing the scripts).
+- Another requirement for Ansible to work with AWS is to have the AWS python SDK (boto and boto3) installed. They can be added wasily with pip.
+
+After we have completed all these steps Ansible will be ready to work with the AWS module.
+
+
+#### Use of Ansible:
+Once the development environment is ready we can create an Ansible file structure for provisioning. It will live in the provision folder. In our case we have choosen to use Ansible not only to provide the instances but to instanciate them. Here is what we have done:
+
+- Firstly we have used ansible-vault for storing AWS credentials in a file that is not presdent in the repository. More information in the ['Setting up AWS and Ansible section'](/docs/index.md#setting-up-aws-cli-and-ansible).
+- We have defined a __[configuration file](/ansible.cfg)__ in the root directory so it can be found by Ansible. Here we just state the directory of the ansible host inventory and the unkown hosts policy.
+- Then we have created the __[hosts inventory file]__(/provision/hosts). It contains an empty host group where the EC2 instances created will be added at runtime. It also defines the private key to use when connecting to them and the default user.
+- Two __tasks__ files have been created. One for [installing docker](/provision/roles/eventpost/tasks/install_docker.yml) in the instances and the other for [terminating instances](/provision/roles/eventpost/tasks/terminate_eventpost_instances.yml) previously created (EventPost instances will be marked using tags). Both of them are part of a __role__ defined in [main.yml](/provision/roles/eventpost/tasks/main.yml). It will be used in the provisioning playbook.
+- The Ansible __playbook__ is the most interesting part. The full file with annotations can be found [here](/provision/provision.yml). Inside it we use 3 hosts directives as described below:
+    - The first host directive:
+        - Uses localhost (our machine).
+        - Terminates old EventPost instances is there is any.
+        - Starts two new instances with specific tags assigned so we can identify them later.
+        - Adds the newly created instances DNS to an empty host group.
+        - Waits until the instances can be addressed throught SSH.
+    - The second host directive: 
+        - Uses the in-memory host group created in by the localhost when starting the instances. also uses a user with privileges to interact with the instances.
+        - Installs Docker in the virtual machines belonging to the host group.
+        - Pulls a docker image to the instance (a different one depending on the microservice. Our Events instance will receive the events image, etc).
+        - Starts a container using the previously pulled image (basically starts the service).
+    - The third host directive:
+        - Uses localhost again.
+        - Checks the microservices ports until they are available.
+        - Populates each microservice database with data.
+
+### Describing the instances:
+AWS EC2 service offers a good amount of configurations for its instances. The configuration that we have choosen for our microservices is the following:
+- Instance type (hardware): We have decided to use __t2.xlarge__, it offers a decent performance (tested in the next section) for a good price (Actually, for development and not wasting money we will be using t2.micro which is included in the free tier usage of the AWS EC2 service).
+![t2 header](img/t2_headers.png "t2 header")
+![t2 specs](img/t2.xlarge_specs.png "t2 specs")
+- Image: As image we will be using UbuntuServer 18.04. By default, AWS does not offer many images for educational accounts and some of them are for specific use. Between the different options Ubuntu Server is a reliable and known to the developer. 
+- Security group: In EC2 instances use a security group for managing which ports are open and who can address them. Using the AWS EC2 GUI conosle we have created a group that opens port 22 (SSH), 80 (HTTP) and 443 (HTTPS) to the world.
+- Region: region where the instances should be created. For the educational account only 'us-east' is available. It would have been nice to deploy the services closer to Spain for latency but we had no choice.
+
 ## Performance:
-### Images:
-Load performance measurements between containers using the Event microservice with 2 different base images (alpine and python:3.7-alpine) has been done. For this purpose we have used the tool [Taurus](https://gettaurus.org/) and used a reference [script with some modifications](/tests/performance/taurus_script.yml). Explanation about the script can be found in the in-line comments of the file. 
-
-The tests have been performend in local using a Intel Core i7-4790 CPU @ 3.60GHz × 8 CPU. 
-
-After pulling the required base images we have used this [dockerfile](/Dockerfile.events), changing only the FROM directive between alpine and python:3.7-alpine and deleting the python install line. Making this we creates 'events' image, with alpine and 'events-second' with 'python:3.7-alpine'.
-
-![Docker images for testing](img/perf_comparison_images.png "Docker images for testing")
-As we can see the image created with 'python:3.7-alpine' doubles the size of the other which is undesirable.
-Now we will run the microservice and perform a load test in both containers.
-![Containers up image](img/perf_comparison_containers.png "Containers up image")
-Measurements for 'events' image (base image: alpine):
-![events image (alpine) measurements](img/perf_comparison_results_alpine.png "events image (alpine) measurements")
-Measurements for 'events-second' image (base image: python:3.7-alpine):
-![events-second image (python:3.7-alpine) measurements](img/perf_comparison_results_python:alpine.png "events image (alpine) measurements")
-
-For the same load we can see that the container using alpine as base image performs slightly better in terms of RPS and also has a slightly lower response time. With this metrics we can then assure than the 'alpine' base image is better for our project.
-
-Later on we required the installation of MongoDB in the container. Alpine4.0 does not supports MongoDB and a lot of problems arise when trying to install and execute it so we changed to a similar debian image, 'bitnami/minideb' it is not as small as alpine (67MB) but supports all the applications we need.
-
 ### Performance testing:
 Performance testing has been carried on using Taurus with Jmeter as executor. A [taurus script](/tests/performance/performance_testing.yml) has been creted for testing both microservices. The script contains auto-explainatory annotations but basically it consist of the following:
 - Two scenarios for each microservice:
@@ -203,12 +238,39 @@ The image below shows how with 100 concurrent users the RPS decrese is irrelevan
 The microservice starts to fail with 200 concurrent users and a combined throughput of 4000 from both scenarios. Also tests with 100 concurrent users and a combined throughput of 10000 shows a decrese of the RPS to 1600.
 ![Performance Testing Events concurrency 200](/docs/img/pt_events_200cc.png "Events MS result with 200 concurrent users.")
 
+### Images  performance testing:
+Load performance measurements between containers using the Event microservice with 2 different base images (alpine and python:3.7-alpine) has been done. For this purpose we have used the tool [Taurus](https://gettaurus.org/) and used a reference [script with some modifications](/tests/performance/taurus_script.yml). Explanation about the script can be found in the in-line comments of the file. 
 
-## Deployment:
-### Heroku:
-The Events microservice has been deployed to Heroku. The steps followed can be found in the [official documentation](https://devcenter.heroku.com/articles/git#prerequisites-install-git-and-the-heroku-cli), basically we just created a heroku app using the CLI, specify that it will be a containerized app and pushed our code to heroku. Additionally we have created a [heroku.yml](/heroku.yml) and enabled autodeploy for our app in order re-deploy the app everytime we make a push to our repository.
+The tests have been performend in local using a Intel Core i7-4790 CPU @ 3.60GHz × 8 CPU. 
 
-Link to the deployed app:
-- https://eventpost.herokuapp.com/events
+After pulling the required base images we have used this [dockerfile](/Dockerfile.events), changing only the FROM directive between alpine and python:3.7-alpine and deleting the python install line. Making this we creates 'events' image, with alpine and 'events-second' with 'python:3.7-alpine'.
 
-This service can be populated using the command `invoke populateHerokuEventsApp` available at [tasks.py](/tasks.py).
+![Docker images for testing](img/perf_comparison_images.png "Docker images for testing")
+As we can see the image created with 'python:3.7-alpine' doubles the size of the other which is undesirable.
+Now we will run the microservice and perform a load test in both containers.
+![Containers up image](img/perf_comparison_containers.png "Containers up image")
+Measurements for 'events' image (base image: alpine):
+![events image (alpine) measurements](img/perf_comparison_results_alpine.png "events image (alpine) measurements")
+Measurements for 'events-second' image (base image: python:3.7-alpine):
+![events-second image (python:3.7-alpine) measurements](img/perf_comparison_results_python:alpine.png "events image (alpine) measurements")
+
+For the same load we can see that the container using alpine as base image performs slightly better in terms of RPS and also has a slightly lower response time. With this metrics we can then assure than the 'alpine' base image is better for our project.
+
+Later on we required the installation of MongoDB in the container. Alpine4.0 does not supports MongoDB and a lot of problems arise when trying to install and execute it so we changed to a similar debian image, 'bitnami/minideb' it is not as small as alpine (67MB) but supports all the applications we need.
+
+### AWS EC2 Instances performance testing:
+For testing the performance of the microservices we have used __t2.xlarge__ EC2 instances and the Taurus scripts created for the previous milestone.
+
+We have tested executing the script from our local computer addressing the instance and executing the script in the same machine (instance) the service is deployed on.
+- Testing from local computer to the instances:
+This works just as a demostration because actually what we are testing, more than the capabilites of the instance or the optimization made to the services, is how fast can the network send our request. We dont really know how many request can the service maintain before overloading, we just know how many request we can send and receive in a certain amount of time.
+However is a good way fo testing latency.
+![aws instances testing p2p](img/aws_taurus_p2p.png "aws instances testing p2p")
+As we can see the number of requests per second is awful, nonetheless, the latency of the request is not that bad having into account the location of the instances (us-east), but obviously it could be better if we could choose a closer region to deploy.
+
+- Testing from inside the instances:
+This test can actually report information of how can the service behave under a real work load as it has to serve a lot more request than in the previous test. 
+To perform this test we have connected to the instance using SCP and tranferred our Taurus script. Then throught SSH we have installed Java and bzt and finally we have executed the test using bzt.
+The results are the following.
+![aws instances testing from localhost](img/aws_taurus.png "aws instances testing from localhost")
+As we can see, even with the the decay in performance that the machine could experiment by executing the test and serving the request, the results are quite good. We get 1224 RPS so we can say that the machine can handle a serious amount of load.
