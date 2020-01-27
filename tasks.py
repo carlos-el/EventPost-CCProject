@@ -76,3 +76,13 @@ def startServer(c, host, port, service):
 @task 
 def populateHerokuEventsApp(c):
     c.run("python3 fixtures.py https://eventpost.herokuapp.com/events events")
+
+# runs ansible for creating and provisioning instances in AWS
+@task 
+def reloadAnsibleAWSCredentials(c):
+    c.run("env EDITOR=nano ansible-vault edit provision/group_vars/all/pass.yml")
+
+# runs ansible for creating and provisioning instances in AWS
+@task 
+def runAWS(c):
+    c.run("ansible-playbook ./provision/provision.yml --ask-vault-pass")
