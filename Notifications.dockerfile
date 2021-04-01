@@ -15,7 +15,7 @@ RUN apt update && apt upgrade && install_packages gnupg wget \
     && echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.2 main" | tee /etc/apt/sources.list.d/mongodb-org-4.2.list \
     && apt update \
     # install more dependencies
-    && install_packages python3 python3-pip mongodb-org \
+    && install_packages python3 python3-pip python3-setuptools mongodb-org \
     && pip3 install falcon gunicorn pymongo falcon-caching \
     && useradd -m docker_user \
     # adds non-root user and creates directories for mongodb with the right permisssions.
