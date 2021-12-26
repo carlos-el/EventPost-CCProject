@@ -1,44 +1,44 @@
-#Run latest version of circleci
-version: 2.1
-#Jobs for testing in different versions of the language
-jobs:
-  build:
-    docker:
-      #version of the docker image
-      - image: circleci/python:latest
-      - image: circleci/mongo:4.0.1
-    steps:
-      #install dependencies and run tests
-      - checkout 
-      - run: 
-          name: install dependencies
-          command: | 
-            pip3 install virtualenv
-            virtualenv venv
-            . venv/bin/activate
-            pip3 install -r requirements.txt
-      - run: 
-          name: run tests
-          command: |
-            . venv/bin/activate
-            invoke test
+# #Run latest version of circleci
+# version: 2.1
+# #Jobs for testing in different versions of the language
+# jobs:
+#   build:
+#     docker:
+#       #version of the docker image
+#       - image: circleci/python:latest
+#       - image: circleci/mongo:4.0.1
+#     steps:
+#       #install dependencies and run tests
+#       - checkout 
+#       - run: 
+#           name: install dependencies
+#           command: | 
+#             pip3 install virtualenv
+#             virtualenv venv
+#             . venv/bin/activate
+#             pip3 install -r requirements.txt
+#       - run: 
+#           name: run tests
+#           command: |
+#             . venv/bin/activate
+#             invoke test
 
-  # repeat for different language versions
-  build-372:
-    docker:
-      - image: circleci/python:3.7.2
-      - image: circleci/mongo:4.0.1
-    steps:
-      - checkout 
-      - run: 
-          name: install dependencies
-          command: | 
-            pip3 install virtualenv
-            virtualenv venv
-            . venv/bin/activate
-            pip3 install -r requirements.txt
-      - run: 
-          name: run tests
-          command: |
-            . venv/bin/activate
-            invoke test
+#   # repeat for different language versions
+#   build-372:
+#     docker:
+#       - image: circleci/python:3.7.2
+#       - image: circleci/mongo:4.0.1
+#     steps:
+#       - checkout 
+#       - run: 
+#           name: install dependencies
+#           command: | 
+#             pip3 install virtualenv
+#             virtualenv venv
+#             . venv/bin/activate
+#             pip3 install -r requirements.txt
+#       - run: 
+#           name: run tests
+#           command: |
+#             . venv/bin/activate
+#             invoke test
